@@ -1,6 +1,37 @@
 const https = require('https');
 const http = require('http');
 
+class ApiKeyStrategy {
+  constructor(apiKey, headerName = 'X-API-Key') {
+    this.apiKey = apiKey;
+    this.headerName = headerName;
+  }
+
+  async inject(headers) {
+    headers[this.headerName] = this.apiKey;
+  }
+}
+
+class JwtStrategy {
+  constructor(token) {
+    this.token = token;
+  }
+
+  async inject(headers) {
+    headers['Authorization'] = `Bearer ${this.token}`;
+  }
+}
+
+class OAuthStrategy {
+  constructor(accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  async inject(headers) {
+    headers['Authorization'] = `OAuth ${this.accessToken}`;
+  }
+}
+
 class AuthProxy {
   constructor(baseUrl, authStrategy) {
     this.baseUrl = baseUrl;
@@ -62,4 +93,4 @@ class AuthProxy {
   delete(path, options = {}) { return this.request('DELETE', path, options); }
 }
 
-module.exports = { AuthProxy };
+module.exports = { AuthProxy, ApiKeyStrategy, JwtStrategy, OAuthStrategy };
